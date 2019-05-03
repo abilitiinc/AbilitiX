@@ -1145,9 +1145,8 @@ namespace graphene { namespace net {
             if (items_by_type.first == core_message_type_enum::block_message_type)
               for (const item_hash_t& id : items_by_type.second)
               {
-                fc_dlog(fc::logger::get("sync"),
-                        "requesting a block from peer ${endpoint} (message_id is ${id})",
-                        ("endpoint", peer_and_items.peer->get_remote_endpoint())("id", id));
+                dlog("requesting a block from peer ${endpoint} (message_id is ${id})",
+                    ("endpoint", peer_and_items.peer->get_remote_endpoint())("id", id));
               }
 
             peer_and_items.peer->send_message(fetch_items_message(items_by_type.first,
@@ -1335,9 +1334,6 @@ namespace graphene { namespace net {
             if (!active_peer->sync_items_requested_from_peer.empty() &&
                 active_peer->last_sync_item_received_time < active_ignored_request_threshold)
             {
-              fc_wlog(fc::logger::get("sync"),
-                      "disconnecting peer ${peer} because they haven't made any progress on my remaining ${count} sync item requests",
-                      ("peer", active_peer->get_remote_endpoint())("count", active_peer->sync_items_requested_from_peer.size()));
               wlog("Disconnecting peer ${peer} because they haven't made any progress on my remaining ${count} sync item requests",
                    ("peer", active_peer->get_remote_endpoint())("count", active_peer->sync_items_requested_from_peer.size()));
               disconnect_due_to_request_timeout = true;
@@ -1347,9 +1343,6 @@ namespace graphene { namespace net {
                 active_peer->item_ids_requested_from_peer &&
                 active_peer->item_ids_requested_from_peer->get<1>() < active_ignored_request_threshold)
               {
-                fc_wlog(fc::logger::get("sync"), "Disconnecting peer ${peer} because they didn't respond to my request for sync item ids after ${synopsis}",
-                      ("peer", active_peer->get_remote_endpoint())
-                      ("synopsis", active_peer->item_ids_requested_from_peer->get<0>()));
                 wlog("Disconnecting peer ${peer} because they didn't respond to my request for sync item ids after ${synopsis}",
                       ("peer", active_peer->get_remote_endpoint())
                       ("synopsis", active_peer->item_ids_requested_from_peer->get<0>()));
@@ -1359,8 +1352,6 @@ namespace graphene { namespace net {
               for (const peer_connection::item_to_time_map_type::value_type& item_and_time : active_peer->items_requested_from_peer)
                 if (item_and_time.second < active_ignored_request_threshold)
                 {
-                  fc_wlog(fc::logger::get("sync"), "Disconnecting peer ${peer} because they didn't respond to my request for item ${id}",
-                        ("peer", active_peer->get_remote_endpoint())("id", item_and_time.first.item_hash));
                   wlog("Disconnecting peer ${peer} because they didn't respond to my request for item ${id}",
                         ("peer", active_peer->get_remote_endpoint())("id", item_and_time.first.item_hash));
                   disconnect_due_to_request_timeout = true;
@@ -1387,8 +1378,6 @@ namespace graphene { namespace net {
             {
               // This is a state we should never get into in the first place, but if we do, we should disconnect the peer
               // to re-establish the connection.
-              fc_wlog(fc::logger::get("sync"), "Disconnecting peer ${peer} because we think we need blocks from them but sync has stalled.",
-                      ("peer", active_peer->get_remote_endpoint()));
               wlog("Disconnecting peer ${peer} because we think we need blocks from them but sync has stalled.",
                       ("peer", active_peer->get_remote_endpoint()));
               peers_to_disconnect_forcibly.push_back(active_peer);
@@ -1916,9 +1905,6 @@ namespace graphene { namespace net {
             uint32_t head_block_num = _delegate->get_block_number(_delegate->get_head_block_id());
             if (next_fork_block_number < head_block_num)
             {
-#ifdef ENABLE_DEBUG_ULOGS
-              ulog("Rejecting connection from peer because their version is too old.  Their version date: ${date}", ("date", originating_peer->graphene_git_revision_unix_timestamp));
-#endif
               wlog("Received hello message from peer running a version of that can only understand blocks up to #${their_hard_fork}, but I'm at head block number #${my_block_number}",
                    ("their_hard_fork", next_fork_block_number)("my_block_number", head_block_num));
               std::ostringstream rejection_message;
@@ -3021,8 +3007,7 @@ namespace graphene { namespace net {
       try
       {
         std::vector<fc::uint160_t> contained_transaction_message_ids;
-        fc_ilog(fc::logger::get("sync"),
-                "p2p pushing sync block #${block_num} ${block_hash}",
+        ilog("p2p pushing sync block #${block_num} ${block_hash}",
                 ("block_num", block_message_to_send.block.block_num())
                 ("block_hash", block_message_to_send.block_id));
         _delegate->handle_block(block_message_to_send, true, contained_transaction_message_ids);
@@ -3035,12 +3020,6 @@ namespace graphene { namespace net {
       }
       catch (const block_older_than_undo_history& e)
       {
-        fc_wlog(fc::logger::get("sync"),
-                "p2p failed to push sync block #${block_num} ${block_hash}: block is on a fork older than our undo history would "
-                "allow us to switch to: ${e}",
-                ("block_num", block_message_to_send.block.block_num())
-                ("block_hash", block_message_to_send.block_id)
-                ("e", (fc::exception)e));
         wlog("Failed to push sync block ${num} (id:${id}): block is on a fork older than our undo history would "
              "allow us to switch to: ${e}",
              ("num", block_message_to_send.block.block_num())
@@ -3055,10 +3034,6 @@ namespace graphene { namespace net {
       }
       catch (const fc::exception& e)
       {
-        fc_wlog(fc::logger::get("sync"),
-                "p2p failed to push sync block #${block_num} ${block_hash}: client rejected sync block sent by peer: ${e}",
-                ("block_num", block_message_to_send.block.block_num())
-                ("block_hash", block_message_to_send.block_id)("e", e));
         wlog("Failed to push sync block ${num} (id:${id}): client rejected sync block sent by peer: ${e}",
              ("num", block_message_to_send.block.block_num())
              ("id", block_message_to_send.block_id)
@@ -3097,9 +3072,7 @@ namespace graphene { namespace net {
                 peers_to_disconnect[peer] = std::make_pair(disconnect_reason_stream.str(),
                                                            fc::oexception(fc::exception(FC_LOG_MESSAGE(error, "You need to upgrade your client due to hard fork at block ${block_number}",
                                                                                                        ("block_number", block_message_to_send.block.block_num())))));
-#ifdef ENABLE_DEBUG_ULOGS
-                ulog("Disconnecting from peer during sync because their version is too old.  Their version date: ${date}", ("date", peer->graphene_git_revision_unix_timestamp));
-#endif
+                wlog("Disconnecting from peer during sync because their version is too old.  Their version date: ${date}", ("date", peer->graphene_git_revision_unix_timestamp));
                 disconnecting_this_peer = true;
               }
             }
@@ -3322,8 +3295,6 @@ namespace graphene { namespace net {
         {
           dlog("stopping processing sync block backlog because we have ${count} blocks in progress",
                ("count", _handle_message_calls_in_progress.size()));
-          //ulog("stopping processing sync block backlog because we have ${count} blocks in progress, total on hand: ${received}",
-          //     ("count", _handle_message_calls_in_progress.size())("received", _received_sync_items.size()));
           if (_received_sync_items.size() >= _node_configuration.maximum_number_of_sync_blocks_to_prefetch)
             _suspend_fetching_sync_blocks = true;
           break;
@@ -3380,8 +3351,7 @@ namespace graphene { namespace net {
         {
           std::vector<fc::uint160_t> contained_transaction_message_ids;
           _message_ids_currently_being_processed.insert(message_hash);
-          fc_ilog(fc::logger::get("sync"),
-                  "p2p pushing block #${block_num} ${block_hash} from ${peer} (message_id was ${id})",
+          ilog("p2p pushing block #${block_num} ${block_hash} from ${peer} (message_id was ${id})",
                   ("block_num", block_message_to_process.block.block_num())
                   ("block_hash", block_message_to_process.block_id)
                   ("peer", originating_peer->get_remote_endpoint())("id", message_hash));
@@ -3413,8 +3383,7 @@ namespace graphene { namespace net {
         }
         else
         {
-          fc_ilog(fc::logger::get("sync"),
-                  "p2p NOT pushing block #${block_num} ${block_hash} from ${peer} because we recently pushed it",
+          ilog("p2p NOT pushing block #${block_num} ${block_hash} from ${peer} because we recently pushed it",
                   ("block_num", block_message_to_process.block.block_num())
                   ("block_hash", block_message_to_process.block_id)
                   ("peer", originating_peer->get_remote_endpoint())("id", message_hash));
@@ -3460,9 +3429,7 @@ namespace graphene { namespace net {
                   next_fork_block_number <= block_number)
               {
                 peers_to_disconnect.insert(peer);
-#ifdef ENABLE_DEBUG_ULOGS
-                ulog("Disconnecting from peer because their version is too old.  Their version date: ${date}", ("date", peer->graphene_git_revision_unix_timestamp));
-#endif
+                wlog("Disconnecting from peer because their version is too old.  Their version date: ${date}", ("date", peer->graphene_git_revision_unix_timestamp));
               }
             }
           }
@@ -4569,7 +4536,7 @@ namespace graphene { namespace net {
                 error_message_stream << "\nStill waiting for port " << listen_endpoint.port() << " to become available\n";
               }
               std::string error_message = error_message_stream.str();
-              ulog(error_message);
+              elog(error_message);
               _delegate->error_encountered( error_message, fc::oexception() );
               fc::usleep( fc::seconds(GRAPHENE_NET_PORT_WAIT_DELAY_SECONDS) );
             }
@@ -4711,7 +4678,7 @@ namespace graphene { namespace net {
       _handshaking_connections.erase(peer);
       _closing_connections.erase(peer);
       _terminating_connections.erase(peer);
-      fc_ilog(fc::logger::get("sync"), "New peer is connected (${peer}), now ${count} active peers",
+      ilog("New peer is connected (${peer}), now ${count} active peers",
               ("peer", peer->get_remote_endpoint())
               ("count", _active_connections.size()));
     }
@@ -4723,7 +4690,7 @@ namespace graphene { namespace net {
       _handshaking_connections.erase(peer);
       _closing_connections.insert(peer);
       _terminating_connections.erase(peer);
-      fc_ilog(fc::logger::get("sync"), "Peer connection closing (${peer}), now ${count} active peers",
+      ilog("Peer connection closing (${peer}), now ${count} active peers",
               ("peer", peer->get_remote_endpoint())
               ("count", _active_connections.size()));
     }
@@ -4735,7 +4702,7 @@ namespace graphene { namespace net {
       _handshaking_connections.erase(peer);
       _closing_connections.erase(peer);
       _terminating_connections.insert(peer);
-      fc_ilog(fc::logger::get("sync"), "Peer connection terminating (${peer}), now ${count} active peers",
+      ilog("Peer connection terminating (${peer}), now ${count} active peers",
               ("peer", peer->get_remote_endpoint())
               ("count", _active_connections.size()));
     }

@@ -143,7 +143,7 @@ namespace fc { namespace rpc {
                      if( exception_caught && i != obj.end() )
                         send_error( i->value(), except );
                      else
-                        fc_wlog( _logger, "json rpc exception: ${exception}", ("exception",except) );
+                        wlog( "json rpc exception: ${exception}", ("exception",except) );
                   }
                   else if( i != obj.end() ) //handle any received JSON response
                   {
@@ -181,7 +181,7 @@ namespace fc { namespace rpc {
                         }
                         else // id found without error, result, nor method field
                         {
-                           fc_wlog( _logger, "no error or result specified in '${message}'", ("message",obj) );
+                           wlog( "no error or result specified in '${message}'", ("message",obj) );
                         }
                      }
                   }
@@ -192,7 +192,6 @@ namespace fc { namespace rpc {
                }
                catch ( fc::exception& e ) // catch all other errors...
                {
-                  fc_elog( _logger, "json rpc exception: ${exception}", ("exception",e ));
                   elog( "json rpc exception: ${exception}", ("exception",e ));
                   eptr = e.dynamic_copy_exception();
                }

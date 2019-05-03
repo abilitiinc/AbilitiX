@@ -11,6 +11,11 @@
 
 namespace fc {
 
+   sophiatx::utilities::SysLogger& logger_() {
+      static sophiatx::utilities::SysLogger sophiatxd_logger("test");
+      return sophiatxd_logger;
+   }
+
     class logger::impl : public fc::retainable {
       public:
          impl()

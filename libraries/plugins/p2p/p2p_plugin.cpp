@@ -139,14 +139,12 @@ bool p2p_plugin_impl::handle_block( const graphene::net::block_message& blk_msg,
          head_block_num = chain.db()->head_block_num();
       });
       if (sync_mode)
-         fc_ilog(fc::logger::get("sync"),
-               "chain pushing sync block #${block_num} ${block_hash}, head is ${head}",
+         dlog("chain pushing sync block #${block_num} ${block_hash}, head is ${head}",
                ("block_num", blk_msg.block.block_num())
                ("block_hash", blk_msg.block_id)
                ("head", head_block_num));
       else
-         fc_ilog(fc::logger::get("sync"),
-               "chain pushing block #${block_num} ${block_hash}, head is ${head}",
+         dlog("chain pushing block #${block_num} ${block_hash}, head is ${head}",
                ("block_num", blk_msg.block.block_num())
                ("block_hash", blk_msg.block_id)
                ("head", head_block_num));
@@ -173,18 +171,14 @@ bool p2p_plugin_impl::handle_block( const graphene::net::block_message& blk_msg,
          return result;
       } catch ( const chain::unlinkable_block_exception& e ) {
          // translate to a graphene::net exception
-         fc_elog(fc::logger::get("sync"),
-               "Error when pushing block, current head block is ${head}:\n${e}",
+         elog("Error when pushing block, current head block is ${head}:\n${e}",
                ("e", e.to_detail_string())
                ("head", head_block_num));
-         elog("Error when pushing block:\n${e}", ("e", e.to_detail_string()));
          FC_THROW_EXCEPTION(graphene::net::unlinkable_block_exception, "Error when pushing block:\n${e}", ("e", e.to_detail_string()));
       } catch( const fc::exception& e ) {
-         fc_elog(fc::logger::get("sync"),
-               "Error when pushing block, current head block is ${head}:\n${e}",
+         elog("Error when pushing block, current head block is ${head}:\n${e}",
                ("e", e.to_detail_string())
                ("head", head_block_num));
-         elog("Error when pushing block:\n${e}", ("e", e.to_detail_string()));
          throw;
       }
    }
@@ -615,13 +609,13 @@ void p2p_plugin::plugin_shutdown() {
 
 void p2p_plugin::broadcast_block( const sophiatx::protocol::signed_block& block )
 {
-   ulog("Broadcasting block #${n}", ("n", block.block_num()));
+   dlog("Broadcasting block #${n}", ("n", block.block_num()));
    my->node->broadcast( graphene::net::block_message( block ) );
 }
 
 void p2p_plugin::broadcast_transaction( const sophiatx::protocol::signed_transaction& tx )
 {
-   ulog("Broadcasting tx #${n}", ("id", tx.id()));
+   dlog("Broadcasting tx #${n}", ("id", tx.id()));
    my->node->broadcast( graphene::net::trx_message( tx ) );
 }
 
