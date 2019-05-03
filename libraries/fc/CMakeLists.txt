@@ -187,11 +187,6 @@ set( fc_sources
      src/rpc/websocket_api.cpp
      src/log/log_message.cpp
      src/log/logger.cpp
-     src/log/appender.cpp
-     src/log/console_appender.cpp
-     src/log/file_appender.cpp
-     src/log/gelf_appender.cpp
-     src/log/logger_config.cpp
      src/crypto/_digest_common.cpp
      src/crypto/openssl.cpp
      src/crypto/aes.cpp

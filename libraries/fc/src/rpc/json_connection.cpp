@@ -15,7 +15,7 @@ namespace fc { namespace rpc {
       {
          public:
             json_connection_impl( fc::buffered_istream_ptr&& in, fc::buffered_ostream_ptr&& out )
-            :_in(fc::move(in)),_out(fc::move(out)),_eof(false),_next_id(0),_logger("json_connection"){}
+            :_in(fc::move(in)),_out(fc::move(out)),_eof(false),_next_id(0){}
 
             fc::buffered_istream_ptr                                              _in;
             fc::buffered_ostream_ptr                                              _out;
@@ -31,8 +31,6 @@ namespace fc { namespace rpc {
 
             fc::mutex                                                             _write_mutex;
             std::function<void(fc::exception_ptr)>                                _on_close;
-
-            logger                                                                _logger;
 
             void send_result( variant id, variant result )
             {
@@ -703,16 +701,6 @@ namespace fc { namespace rpc {
          my->_out->flush();
       }
       return my->_awaiting[id];
-   }
-
-   logger json_connection::get_logger()const
-   {
-      return my->_logger;
-   }
-
-   void   json_connection::set_logger( const logger& l )
-   {
-      my->_logger = l;
    }
 
 }}
