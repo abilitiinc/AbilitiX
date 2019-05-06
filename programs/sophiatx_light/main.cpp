@@ -57,7 +57,6 @@ int main( int argc, char** argv )
 
       fc::ecc::public_key::init_cache(static_cast<uint32_t>(SOPHIATX_MAX_BLOCK_SIZE / SOPHIATX_MIN_TRANSACTION_SIZE_LIMIT), std::chrono::milliseconds(2000));
 
-      sophiatx::utilities::set_logging_program_options( options );
       options.add_options()
             ("backtrace", bpo::value< string >()->default_value( "yes" ), "Whether to print backtrace on SIGSEGV" );
 
@@ -78,9 +77,11 @@ int main( int argc, char** argv )
 
       try
       {
-         fc::optional< fc::logging_config > logging_config = sophiatx::utilities::load_logging_config( args, appbase::app_factory().data_dir );
-         if( logging_config )
-            fc::configure_logging( *logging_config );
+         // TODO: configure new logging
+         fc::Logger::init("sophiatxd_light", LOG_INFO);
+//         fc::optional< fc::logging_config > logging_config = sophiatx::utilities::load_logging_config( args, appbase::app_factory().data_dir );
+//         if( logging_config )
+//            fc::configure_logging( *logging_config );
       }
       catch( const fc::exception& )
       {

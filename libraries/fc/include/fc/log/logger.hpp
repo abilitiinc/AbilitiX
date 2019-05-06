@@ -1,7 +1,6 @@
 #pragma once
-//#include <fc/string.hpp>
-//#include <fc/time.hpp>
-//#include <fc/shared_ptr.hpp>
+
+#include <memory>
 #include <fc/log/log_message.hpp>
 #include <sophiatx/utilities/sys_logger.hpp>
 
@@ -9,11 +8,47 @@ namespace fc
 {
 
 /**
- * @brief Usage sophiatx::utilities::logger().info("message to log")
- *
- * @return SysLogger&
+ * @brief Singleton global application syslogger implementation. For custom Syslogger, use directly sophiatx::utilities::SysLogger
  */
-sophiatx::utilities::SysLogger& logger_();
+class Logger {
+public:
+   // Delete all constructors
+   Logger()                         = delete;
+   Logger(const Logger&)            = delete;
+   Logger& operator=(const Logger&) = delete;
+   Logger(Logger&)                  = delete;
+   Logger& operator=(Logger&&)      = delete;
+   ~Logger()                        = default;
+
+   /**
+    * @brief Initializes logger
+    *
+    * @param app_name name of the application. Based on this parameter, separate logs are created from syslog, see configs in etc/syslog.d
+    * @param log_level possible values:
+    *           LOG_EMERG	0	   // system is unusable
+    *           LOG_ALERT	1	   // action must be taken immediately
+    *           LOG_CRIT	2	   // critical conditions
+    *           LOG_ERR		3	   // error conditions
+    *           LOG_WARNING	4	// warning conditions
+    *           LOG_NOTICE	5	   // normal but significant condition
+    *           LOG_INFO	6	   // informational
+    *           LOG_DEBUG	7	   // debug-level messages
+    */
+   static void init(const std::string& app_name, uint log_level);
+
+   /**
+    * @brief Returns true if logger was initiliazed, otherwise false
+    */
+   static bool isInitialized();
+
+   /**
+    * @brief Returns pointer to logger
+    */
+   static const std::unique_ptr<sophiatx::utilities::SysLogger>& get_instance();
+private:
+   static std::unique_ptr<sophiatx::utilities::SysLogger> logger_;
+
+}; // class Logger
 
 } // namespace fc
 
@@ -22,14 +57,14 @@ sophiatx::utilities::SysLogger& logger_();
 #define LOCATION "[" __FILE__ ":" STRINGIFY(__LINE__) "] --"
 
 //Usage: ilog( "Format four: ${arg}  five: ${five}", ("arg",4)("five",5) );
-#define dlog( FORMAT, ... ) fc::logger_().debug( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define ilog( FORMAT, ... ) fc::logger_().info( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define nlog( FORMAT, ... ) fc::logger_().notice( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define wlog( FORMAT, ... ) fc::logger_().warning( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define elog( FORMAT, ... ) fc::logger_().error( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define clog( FORMAT, ... ) fc::logger_().critical( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define alog( FORMAT, ... ) fc::logger_().alert( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
-#define emlog( FORMAT, ... ) fc::logger_().emergency( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define dlog( FORMAT, ... ) fc::Logger::get_instance()->debug( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define ilog( FORMAT, ... ) fc::Logger::get_instance()->info( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define nlog( FORMAT, ... ) fc::Logger::get_instance()->notice( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define wlog( FORMAT, ... ) fc::Logger::get_instance()->warning( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define elog( FORMAT, ... ) fc::Logger::get_instance()->error( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define clog( FORMAT, ... ) fc::Logger::get_instance()->critical( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define alog( FORMAT, ... ) fc::Logger::get_instance()->alert( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
+#define emlog( FORMAT, ... ) fc::Logger::get_instance()->emergency( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
 
 
 // this disables all normal logging statements -- not something you'd normally want to do,

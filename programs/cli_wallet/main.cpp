@@ -47,11 +47,7 @@
 #include <fc/interprocess/signals.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
-
-#include <fc/log/console_appender.hpp>
-#include <fc/log/file_appender.hpp>
 #include <fc/log/logger.hpp>
-#include <fc/log/logger_config.hpp>
 
 #ifdef WIN32
 # include <signal.h>
@@ -107,27 +103,8 @@ int main( int argc, char** argv )
       if( options.count("chain-id") )
             _sophiatx_chain_id = generate_chain_id( options["chain-id"].as< std::string >() );
 
-      fc::path data_dir;
-      fc::logging_config cfg;
-      fc::path log_dir = data_dir / "logs";
-
-      fc::file_appender::config ac;
-      ac.filename             = log_dir / "rpc" / "rpc.log";
-      ac.flush                = true;
-      ac.rotate               = true;
-      ac.rotation_interval    = fc::hours( 1 );
-      ac.rotation_limit       = fc::days( 1 );
-
-      std::cout << "Logging RPC to file: " << (data_dir / ac.filename).preferred_string() << "\n";
-
-      cfg.appenders.push_back(fc::appender_config( "default", "console", fc::variant(fc::console_appender::config())));
-      cfg.appenders.push_back(fc::appender_config( "rpc", "file", fc::variant(ac)));
-
-      cfg.loggers = { fc::logger_config("default"), fc::logger_config( "rpc") };
-      cfg.loggers.front().level = fc::log_level::info;
-      cfg.loggers.front().appenders = {"default"};
-      cfg.loggers.back().level = fc::log_level::debug;
-      cfg.loggers.back().appenders = {"rpc"};
+      // Initializes cli_wallet logger
+      fc::Logger::init("cli_wallet", LOG_INFO);
 
 
       //
