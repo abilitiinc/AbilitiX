@@ -64,6 +64,9 @@ void application::set_program_options()
          ("plugin", bpo::value< vector<string> >()->composing(), "Plugin(s) to enable, may be specified multiple times");
    app_cfg_opts.add_options()
          ("backtrace", bpo::value< string >()->default_value( "yes" ), "Whether to print backtrace on SIGSEGV" );
+   app_cfg_opts.add_options()
+         ("log-level", bpo::value< string >()->default_value( "info" ), "Log level. Possible values: debug, info, notice, warning, error, critical, alert, emergency" );
+
 
    app_cfg_opts.add_options()
          ("external-plugins-dir", bpo::value<bfs::path>()->default_value( "external-plugins" ), "Directory containing external/runtime-loadable plugins binaries (absolute path or relative to the program option data-dir/)");
@@ -270,10 +273,6 @@ bool application::initialize_impl(int argc, char** argv, vector<abstract_plugin*
 {
    try
    {
-      if ( my->_args.count( "backtrace" ) > 0 ) {
-         std::cout << my->_args.at( "backtrace" ).as<std::string>() << std::endl;
-      }
-
       if(my->_args.count("plugin") > 0)
       {
          auto plugins = my->_args.at("plugin").as<std::vector<std::string>>();

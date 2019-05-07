@@ -65,12 +65,15 @@ int main( int argc, char** argv )
 {
    try
    {
-      appbase::app().register_plugin<sophiatx::plugins::chain::chain_plugin_full>();appbase::app().register_plugin<sophiatx::plugins::chain::chain_plugin_full>();
+      appbase::app().register_plugin<sophiatx::plugins::chain::chain_plugin_full>();
       sophiatx::plugins::register_plugins();
 
       // Reads main application config file
       appbase::app().load_config(argc, argv);
-      fc::Logger::init("sophiatxd", LOG_INFO);
+      auto& args = appbase::app().get_args();
+
+      // Initializes logger
+      fc::Logger::init("sophiatx"/* Do not change this parameter as syslog config depends on it !!! */, args.at("log-level").as< std::string >());
 
 
       fc::ecc::public_key::init_cache(static_cast<uint32_t>(SOPHIATX_MAX_BLOCK_SIZE / SOPHIATX_MIN_TRANSACTION_SIZE_LIMIT), std::chrono::milliseconds(2000));
@@ -88,7 +91,7 @@ int main( int argc, char** argv )
          return 0;
       }
 
-      auto& args = appbase::app().get_args();
+
       if( args.at( "backtrace" ).as< string >() == "yes" )
       {
          fc::print_stacktrace_on_segfault();

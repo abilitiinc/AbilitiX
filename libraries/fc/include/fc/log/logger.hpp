@@ -25,19 +25,19 @@ public:
     *
     * @param app_name name of the application. Based on this parameter, separate logs are created from syslog, see configs in etc/syslog.d
     * @param log_level possible values:
-    *           LOG_EMERG	0	   // system is unusable
-    *           LOG_ALERT	1	   // action must be taken immediately
-    *           LOG_CRIT	2	   // critical conditions
-    *           LOG_ERR		3	   // error conditions
-    *           LOG_WARNING	4	// warning conditions
-    *           LOG_NOTICE	5	   // normal but significant condition
-    *           LOG_INFO	6	   // informational
-    *           LOG_DEBUG	7	   // debug-level messages
+    *           "debug"     - LOG_EMERG	0	   // system is unusable
+    *           "emergency" - LOG_ALERT	1	   // action must be taken immediately
+    *           "critical"  - LOG_CRIT	   2	   // critical conditions
+    *           "error"     - LOG_ERR		3	   // error conditions
+    *           "warning"   - LOG_WARNING	4	   // warning conditions
+    *           "notice"    - LOG_NOTICE	5	   // normal but significant condition
+    *           "info"      - LOG_INFO	   6	   // informational
+    *           "debug"     - LOG_DEBUG	7	   // debug-level messages
     */
-   static void init(const std::string& app_name, uint log_level);
+   static void init(const std::string& app_name, const std::string& log_level_str);
 
    /**
-    * @brief Returns true if logger was initiliazed, otherwise false
+    * @brief Returns true if logger was initialized, otherwise false
     */
    static bool isInitialized();
 
@@ -49,6 +49,9 @@ private:
    static std::unique_ptr<sophiatx::utilities::SysLogger> logger_;
 
 }; // class Logger
+
+
+
 
 } // namespace fc
 

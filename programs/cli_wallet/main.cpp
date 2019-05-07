@@ -69,6 +69,7 @@ int main( int argc, char** argv )
       boost::program_options::options_description opts;
          opts.add_options()
          ("help,h", "Print this help message and exit.")
+         ("log-level", bpo::value< string >()->default_value( "info" ), "Log level. Possible values: debug, info, notice, warning, error, critical, alert, emergency" )
          ("server-rpc-endpoint,s", bpo::value<string>()->implicit_value("ws://127.0.0.1:9191"), "Server websocket RPC endpoint")
          ("cert-authority,a", bpo::value<string>()->default_value("_default"), "Trusted CA bundle file for connecting to wss:// TLS server")
          ("rpc-endpoint,r", bpo::value<string>()->implicit_value("127.0.0.1:9192"), "Endpoint for wallet websocket RPC to listen on")
@@ -103,8 +104,8 @@ int main( int argc, char** argv )
       if( options.count("chain-id") )
             _sophiatx_chain_id = generate_chain_id( options["chain-id"].as< std::string >() );
 
-      // Initializes cli_wallet logger
-      fc::Logger::init("cli_wallet", LOG_INFO);
+      // Initializes logger
+      fc::Logger::init("cli_wallet"/* Do not change this parameter as syslog config depends on it !!! */, options.at("log-level").as< std::string >());
 
 
       //
