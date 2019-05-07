@@ -70,6 +70,7 @@ private:
 #define emlog( FORMAT, ... ) fc::Logger::get_instance()->emergency( LOCATION, FC_LOG_MESSAGE_( FORMAT, __VA_ARGS__ ).get_message() )
 
 
+
 // this disables all normal logging statements -- not something you'd normally want to do,
 // but it's useful if you're benchmarking something and suspect logging is causing
 // a slowdown.
@@ -91,7 +92,6 @@ private:
    # undef emlog
    # define emlog(...)
 #endif
-
 
 
 #include <boost/preprocessor/seq/for_each.hpp>

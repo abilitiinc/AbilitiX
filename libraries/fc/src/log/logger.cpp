@@ -32,7 +32,8 @@ void Logger::init(const std::string& app_name, const std::string& log_level_str)
 
 const std::unique_ptr<sophiatx::utilities::SysLogger>& Logger::get_instance() {
    if (logger_ == nullptr) {
-      FC_THROW("fc::Logger::init(...) must be called before fc::Logger::get_instance()");
+      init("sophiatx", "info");
+      elog("Default logger \"sophiatx\" with LOG_INFO level created. fc::Logger::init(...) should be called before fc::Logger::get_instance()");
    }
 
    return logger_;

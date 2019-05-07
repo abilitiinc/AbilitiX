@@ -13,12 +13,14 @@
 #include <sophiatx/plugins/alexandria_api/alexandria_api_plugin.hpp>
 
 #include <fc/crypto/digest.hpp>
+#include <fc/log/logger.hpp>
 
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 
 #include "database_fixture.hpp"
+
 
 uint32_t SOPHIATX_TESTING_GENESIS_TIMESTAMP = 1431700000;
 
@@ -51,6 +53,8 @@ clean_database_fixture::clean_database_fixture()
    appbase::app().register_plugin< sophiatx::plugins::account_history::account_history_plugin >();
    db_plugin = &appbase::app().register_plugin< sophiatx::plugins::debug_node::debug_node_plugin >();
    appbase::app().register_plugin< sophiatx::plugins::witness::witness_plugin >();
+
+   appbase::app().load_config(argc, argv);
 
    db_plugin->logging = false;
    appbase::app().initialize<

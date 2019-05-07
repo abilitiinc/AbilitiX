@@ -291,9 +291,10 @@ bool application::initialize_impl(int argc, char** argv, vector<abstract_plugin*
          return false;
       }
 
-      for (const auto& plugin : autostart_plugins)
+      for (const auto& plugin : autostart_plugins) {
          if (plugin != nullptr && plugin->get_state() == abstract_plugin::registered)
             plugin->initialize(my->_args);
+      }
 
       bpo::notify(my->_args);
 
