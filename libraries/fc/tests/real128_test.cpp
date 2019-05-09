@@ -1,5 +1,6 @@
 #include <fc/real128.hpp>
 #include <boost/test/unit_test.hpp>
+#include <iostream>
 
 BOOST_AUTO_TEST_SUITE(fc)
 
