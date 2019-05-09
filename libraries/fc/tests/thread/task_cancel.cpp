@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
 #include <fc/thread/thread.hpp>
 #include <fc/thread/scoped_lock.hpp>
 #include <fc/thread/mutex.hpp>
