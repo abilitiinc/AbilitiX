@@ -65,7 +65,7 @@ void application::set_program_options()
    app_cfg_opts.add_options()
          ("backtrace", bpo::value< string >()->default_value( "yes" ), "Whether to print backtrace on SIGSEGV" );
    app_cfg_opts.add_options()
-         ("log-level", bpo::value< string >()->default_value( "info" ), "Log level. Possible values: debug, info, notice, warning, error, critical, alert, emergency" );
+         ("log-level", bpo::value< string >()->default_value( "info" ), "Log level. Possible values: debug, info, notice, warning, error, critical, alert, emergency. For monitoring to work, min. level is notice !" );
 
 
    app_cfg_opts.add_options()

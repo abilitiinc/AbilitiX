@@ -82,13 +82,6 @@
 
 #include <fc/git_revision.hpp>
 
-//#define ENABLE_DEBUG_ULOGS
-
-#ifdef DEFAULT_LOGGER
-# undef DEFAULT_LOGGER
-#endif
-#define DEFAULT_LOGGER "p2p"
-
 #define P2P_IN_DEDICATED_THREAD 1
 
 #define INVOCATION_COUNTER(name) \
@@ -3007,11 +3000,11 @@ namespace graphene { namespace net {
       try
       {
         std::vector<fc::uint160_t> contained_transaction_message_ids;
-        ilog("p2p pushing sync block #${block_num} ${block_hash}",
+        dlog("p2p pushing sync block #${block_num} ${block_hash}",
                 ("block_num", block_message_to_send.block.block_num())
                 ("block_hash", block_message_to_send.block_id));
         _delegate->handle_block(block_message_to_send, true, contained_transaction_message_ids);
-        ilog("Successfully pushed sync block ${num} (id:${id})",
+        dlog("Successfully pushed sync block ${num} (id:${id})",
              ("num", block_message_to_send.block.block_num())
              ("id", block_message_to_send.block_id));
         _most_recent_blocks_accepted.push_back(block_message_to_send.block_id);
@@ -4710,44 +4703,44 @@ namespace graphene { namespace net {
     void node_impl::dump_node_status()
     {
       VERIFY_CORRECT_THREAD();
-      ilog( "----------------- PEER STATUS UPDATE --------------------" );
-      ilog( " number of peers: ${active} active, ${handshaking}, ${closing} closing.  attempting to maintain ${desired} - ${maximum} peers",
+      dlog( "----------------- PEER STATUS UPDATE --------------------" );
+      dlog( " number of peers: ${active} active, ${handshaking}, ${closing} closing.  attempting to maintain ${desired} - ${maximum} peers",
            ( "active", _active_connections.size() )("handshaking", _handshaking_connections.size() )("closing",_closing_connections.size() )
            ( "desired", _node_configuration.desired_number_of_connections )("maximum", _node_configuration.maximum_number_of_connections ) );
       for( const peer_connection_ptr& peer : _active_connections )
       {
-        ilog( "       active peer ${endpoint} peer_is_in_sync_with_us:${in_sync_with_us} we_are_in_sync_with_peer:${in_sync_with_them}",
+        dlog( "       active peer ${endpoint} peer_is_in_sync_with_us:${in_sync_with_us} we_are_in_sync_with_peer:${in_sync_with_them}",
              ( "endpoint", peer->get_remote_endpoint() )
              ( "in_sync_with_us", !peer->peer_needs_sync_items_from_us )("in_sync_with_them", !peer->we_need_sync_items_from_peer ) );
         if( peer->we_need_sync_items_from_peer )
-          ilog( "              above peer has ${count} sync items we might need", ("count", peer->ids_of_items_to_get.size() ) );
+          dlog( "              above peer has ${count} sync items we might need", ("count", peer->ids_of_items_to_get.size() ) );
         if (peer->inhibit_fetching_sync_blocks)
-          ilog( "              we are not fetching sync blocks from the above peer (inhibit_fetching_sync_blocks == true)" );
+          dlog( "              we are not fetching sync blocks from the above peer (inhibit_fetching_sync_blocks == true)" );
 
       }
       for( const peer_connection_ptr& peer : _handshaking_connections )
       {
-        ilog( "  handshaking peer ${endpoint} in state ours(${our_state}) theirs(${their_state})",
+        dlog( "  handshaking peer ${endpoint} in state ours(${our_state}) theirs(${their_state})",
              ( "endpoint", peer->get_remote_endpoint() )("our_state", peer->our_state )("their_state", peer->their_state ) );
       }
 
-      ilog( "--------- MEMORY USAGE ------------" );
-      ilog( "node._active_sync_requests size: ${size}", ("size", _active_sync_requests.size() ) );
-      ilog( "node._received_sync_items size: ${size}", ("size", _received_sync_items.size() ) );
-      ilog( "node._new_received_sync_items size: ${size}", ("size", _new_received_sync_items.size() ) );
-      ilog( "node._items_to_fetch size: ${size}", ("size", _items_to_fetch.size() ) );
-      ilog( "node._new_inventory size: ${size}", ("size", _new_inventory.size() ) );
-      ilog( "node._message_cache size: ${size}", ("size", _message_cache.size() ) );
+      dlog( "--------- MEMORY USAGE ------------" );
+      dlog( "node._active_sync_requests size: ${size}", ("size", _active_sync_requests.size() ) );
+      dlog( "node._received_sync_items size: ${size}", ("size", _received_sync_items.size() ) );
+      dlog( "node._new_received_sync_items size: ${size}", ("size", _new_received_sync_items.size() ) );
+      dlog( "node._items_to_fetch size: ${size}", ("size", _items_to_fetch.size() ) );
+      dlog( "node._new_inventory size: ${size}", ("size", _new_inventory.size() ) );
+      dlog( "node._message_cache size: ${size}", ("size", _message_cache.size() ) );
       for( const peer_connection_ptr& peer : _active_connections )
       {
-        ilog( "  peer ${endpoint}", ("endpoint", peer->get_remote_endpoint() ) );
-        ilog( "    peer.ids_of_items_to_get size: ${size}", ("size", peer->ids_of_items_to_get.size() ) );
-        ilog( "    peer.inventory_peer_advertised_to_us size: ${size}", ("size", peer->inventory_peer_advertised_to_us.size() ) );
-        ilog( "    peer.inventory_advertised_to_peer size: ${size}", ("size", peer->inventory_advertised_to_peer.size() ) );
-        ilog( "    peer.items_requested_from_peer size: ${size}", ("size", peer->items_requested_from_peer.size() ) );
-        ilog( "    peer.sync_items_requested_from_peer size: ${size}", ("size", peer->sync_items_requested_from_peer.size() ) );
+        dlog( "  peer ${endpoint}", ("endpoint", peer->get_remote_endpoint() ) );
+        dlog( "    peer.ids_of_items_to_get size: ${size}", ("size", peer->ids_of_items_to_get.size() ) );
+        dlog( "    peer.inventory_peer_advertised_to_us size: ${size}", ("size", peer->inventory_peer_advertised_to_us.size() ) );
+        dlog( "    peer.inventory_advertised_to_peer size: ${size}", ("size", peer->inventory_advertised_to_peer.size() ) );
+        dlog( "    peer.items_requested_from_peer size: ${size}", ("size", peer->items_requested_from_peer.size() ) );
+        dlog( "    peer.sync_items_requested_from_peer size: ${size}", ("size", peer->sync_items_requested_from_peer.size() ) );
       }
-      ilog( "--------- END MEMORY USAGE ------------" );
+      dlog( "--------- END MEMORY USAGE ------------" );
     }
 
     void node_impl::disconnect_from_peer( peer_connection* peer_to_disconnect,
