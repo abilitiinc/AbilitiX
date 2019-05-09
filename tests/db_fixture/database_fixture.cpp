@@ -53,10 +53,11 @@ clean_database_fixture::clean_database_fixture()
    appbase::app().register_plugin< sophiatx::plugins::account_history::account_history_plugin >();
    db_plugin = &appbase::app().register_plugin< sophiatx::plugins::debug_node::debug_node_plugin >();
    appbase::app().register_plugin< sophiatx::plugins::witness::witness_plugin >();
-
    appbase::app().load_config(argc, argv);
 
+   fc::Logger::init("sophiatx","error");
    db_plugin->logging = false;
+
    appbase::app().initialize<
       sophiatx::plugins::chain::chain_plugin_full,
       sophiatx::plugins::account_history::account_history_plugin,
@@ -197,8 +198,11 @@ private_database_fixture::private_database_fixture()
       appbase::app().register_plugin< sophiatx::plugins::account_history::account_history_plugin >();
       db_plugin = &appbase::app().register_plugin< sophiatx::plugins::debug_node::debug_node_plugin >();
       appbase::app().register_plugin< sophiatx::plugins::witness::witness_plugin >();
+      appbase::app().load_config(argc, argv);
 
       db_plugin->logging = false;
+      fc::Logger::init("sophiatx","error");
+
       appbase::app().initialize<
             sophiatx::plugins::chain::chain_plugin_full,
             sophiatx::plugins::account_history::account_history_plugin,
@@ -284,7 +288,9 @@ live_database_fixture::live_database_fixture()
       appbase::app().register_plugin<sophiatx::plugins::chain::chain_plugin_full>();
       appbase::app().register_plugin< sophiatx::plugins::account_history::account_history_plugin >();
       db_plugin = &appbase::app().register_plugin< sophiatx::plugins::debug_node::debug_node_plugin >();
+      appbase::app().load_config(argc, argv);
 
+      fc::Logger::init("sophiatx","error");
       appbase::app().initialize<
          sophiatx::plugins::chain::chain_plugin_full,
          sophiatx::plugins::account_history::account_history_plugin, sophiatx::plugins::debug_node::debug_node_plugin
@@ -705,8 +711,10 @@ json_rpc_database_fixture::json_rpc_database_fixture()
    appbase::app().register_plugin< sophiatx::plugins::database_api::database_api_plugin >();
    appbase::app().register_plugin< sophiatx::plugins::witness::witness_api_plugin >();
    appbase::app().register_plugin< sophiatx::plugins::alexandria_api::alexandria_api_plugin >();
+   appbase::app().load_config(argc, argv);
 
    db_plugin->logging = false;
+   fc::Logger::init("sophiatx","error");
    appbase::app().initialize<
       sophiatx::plugins::chain::chain_plugin_full,
       sophiatx::plugins::account_history::account_history_plugin,
@@ -718,6 +726,7 @@ json_rpc_database_fixture::json_rpc_database_fixture()
       sophiatx::plugins::witness::witness_api_plugin,
       sophiatx::plugins::alexandria_api::alexandria_api_plugin
       >( argc, argv );
+   appbase::app().load_config(argc, argv);
 
 
    appbase::app().get_plugin< sophiatx::plugins::alexandria_api::alexandria_api_plugin >().plugin_startup();
