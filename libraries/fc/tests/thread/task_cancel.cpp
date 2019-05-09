@@ -2,7 +2,6 @@
 
 #include <fc/thread/thread.hpp>
 #include <fc/thread/scoped_lock.hpp>
-#include <fc/log/logger.hpp>
 #include <fc/thread/mutex.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/thread/non_preemptable_scope_check.hpp>
@@ -242,7 +241,7 @@ BOOST_AUTO_TEST_CASE( cancel_scheduled_task )
   } 
   catch ( const fc::exception& e )
   {
-    wlog( "${e}", ("e",e.to_detail_string() ) );
+    std::cerr << "Caught exception: " << e.to_detail_string() << std::endl;
   }
 }
 
