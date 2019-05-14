@@ -30,15 +30,7 @@ enum sort_order_type
    by_witness_account,
    by_from_id,
    by_ratification_deadline,
-   by_withdraw_route,
-   by_destination,
-   by_complete_from_id,
-   by_to_complete,
-   by_account_expiration,
-   by_price,
    by_author,
-   by_buyer_app,
-   by_app_id,
    by_balance,
    by_name_reverse,
    by_id_reverse,
@@ -53,15 +45,7 @@ enum sort_order_type
    by_witness_account_reverse,
    by_from_id_reverse,
    by_ratification_deadline_reverse,
-   by_withdraw_route_reverse,
-   by_destination_reverse,
-   by_complete_from_id_reverse,
-   by_to_complete_reverse,
-   by_account_expiration_reverse,
-   by_price_reverse,
    by_author_reverse,
-   by_buyer_app_reverse,
-   by_app_id_reverse,
 };
 
 /* get_config */
@@ -396,15 +380,7 @@ FC_REFLECT_ENUM( sophiatx::plugins::database_api::sort_order_type,
          (by_witness_account)
          (by_from_id)
          (by_ratification_deadline)
-         (by_withdraw_route)
-         (by_destination)
-         (by_complete_from_id)
-         (by_to_complete)
-         (by_account_expiration)
-         (by_price)
          (by_author)
-         (by_buyer_app)
-         (by_app_id)
          (by_balance)
          (by_name_reverse)
          (by_id_reverse)
@@ -419,15 +395,7 @@ FC_REFLECT_ENUM( sophiatx::plugins::database_api::sort_order_type,
          (by_witness_account_reverse)
          (by_from_id_reverse)
          (by_ratification_deadline_reverse)
-         (by_withdraw_route_reverse)
-         (by_destination_reverse)
-         (by_complete_from_id_reverse)
-         (by_to_complete_reverse)
-         (by_account_expiration_reverse)
-         (by_price_reverse)
-         (by_author_reverse)
-         (by_buyer_app_reverse)
-         (by_app_id_reverse))
+         (by_author_reverse))
 
 
 FC_REFLECT( sophiatx::plugins::database_api::get_current_price_feed_args,

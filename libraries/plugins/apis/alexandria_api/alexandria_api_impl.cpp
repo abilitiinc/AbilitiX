@@ -254,7 +254,7 @@ DEFINE_API_IMPL( alexandria_api_impl, list_witnesses_by_vote )
    }
    else
    {
-      auto start = _database_api->list_witnesses( { args.name, 1, database_api::by_name_reverse } );
+      auto start = _database_api->list_witnesses( { args.name, 1, database_api::by_name } );
 
       if( start.witnesses.size() == 0 )
          return result;
