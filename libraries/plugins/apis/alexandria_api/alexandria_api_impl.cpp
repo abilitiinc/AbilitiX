@@ -708,7 +708,7 @@ DEFINE_API_IMPL(alexandria_api_impl, get_received_documents) {
 DEFINE_API_IMPL(alexandria_api_impl, get_account_history) {
    checkApiEnabled(_account_history_api);
 
-   auto history = _account_history_api->get_account_history( { args.account, args.start, args.limit, true } ).history;
+   auto history = _account_history_api->get_account_history( { args.account, args.start, args.limit} ).history;
    get_account_history_return result;
 
    api_operation l_op;

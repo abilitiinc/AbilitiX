@@ -32,20 +32,6 @@ enum sort_order_type
    by_ratification_deadline,
    by_author,
    by_balance,
-   by_name_reverse,
-   by_id_reverse,
-   by_proxy_reverse,
-   by_next_vesting_withdrawal_reverse,
-   by_account_reverse,
-   by_expiration_reverse,
-   by_effective_date_reverse,
-   by_vote_name_reverse,
-   by_schedule_time_reverse,
-   by_account_witness_reverse,
-   by_witness_account_reverse,
-   by_from_id_reverse,
-   by_ratification_deadline_reverse,
-   by_author_reverse,
 };
 
 /* get_config */
@@ -381,21 +367,7 @@ FC_REFLECT_ENUM( sophiatx::plugins::database_api::sort_order_type,
          (by_from_id)
          (by_ratification_deadline)
          (by_author)
-         (by_balance)
-         (by_name_reverse)
-         (by_id_reverse)
-         (by_proxy_reverse)
-         (by_next_vesting_withdrawal_reverse)
-         (by_account_reverse)
-         (by_expiration_reverse)
-         (by_effective_date_reverse)
-         (by_vote_name_reverse)
-         (by_schedule_time_reverse)
-         (by_account_witness_reverse)
-         (by_witness_account_reverse)
-         (by_from_id_reverse)
-         (by_ratification_deadline_reverse)
-         (by_author_reverse))
+         (by_balance))
 
 
 FC_REFLECT( sophiatx::plugins::database_api::get_current_price_feed_args,

@@ -55,17 +55,16 @@ class database_api_impl
       static ResultType on_push_default( const ResultType& r ) { return r; }
 
       template< typename IndexType, typename OrderType, typename ValueType, typename ResultType, typename OnPush >
-      void iterate_results( ValueType start, vector< ResultType >& result, uint32_t limit, OnPush&& on_push = &database_api_impl::on_push_default< ResultType >, bool reverse = false )
+      void iterate_results( ValueType start, vector< ResultType >& result, uint32_t limit, OnPush&& on_push = &database_api_impl::on_push_default< ResultType >)
       {
          const auto& idx = _db->get_index< IndexType, OrderType >();
-         auto itr = reverse? (idx.upper_bound(start)): idx.lower_bound( start );
-         auto end = reverse? idx.begin() : idx.end();
+         auto itr = idx.upper_bound(start);
+         auto end = idx.begin();
 
          while( result.size() < limit && itr != end )
          {
-            if (reverse) --itr;
+            --itr;
             result.push_back( on_push( *itr ) );
-            if (!reverse) ++itr;
          }
       }
 
@@ -143,46 +142,38 @@ DEFINE_API_IMPL( database_api_impl, list_witnesses )
 
    list_witnesses_return result;
    result.witnesses.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_name ):
-      case( by_name_reverse ):
       {
          iterate_results< chain::witness_index, chain::by_name >(
             args.start.as< protocol::account_name_type >(),
             result.witnesses,
             args.limit,
-            [&]( const witness_object& w ){ return api_witness_object( w ); },
-            reverse);
+            [&]( const witness_object& w ){ return api_witness_object( w );});
          break;
       }
       case( by_id ):
-      case( by_id_reverse ):
       {
          iterate_results< chain::witness_index, chain::by_id >(
                args.start.as< witness_id_type >(),
                result.witnesses,
                args.limit,
-               [&]( const witness_object& w ){ return api_witness_object( w ); },
-               reverse);
+               [&]( const witness_object& w ){ return api_witness_object( w ); });
          break;
       }
       case( by_vote_name ):
-      case( by_vote_name_reverse ):
       {
          auto key = args.start.as< std::pair< share_type, account_name_type > >();
          iterate_results< chain::witness_index, chain::by_vote_name >(
             boost::make_tuple( key.first, key.second ),
             result.witnesses,
             args.limit,
-            [&]( const witness_object& w ){ return api_witness_object( w ); },
-            reverse );
+            [&]( const witness_object& w ){ return api_witness_object( w ); });
          break;
       }
       case( by_schedule_time ):
-      case( by_schedule_time_reverse ):
       {
          auto key = args.start.as< std::pair< fc::uint128, account_name_type > >();
          auto wit_id = _db->get< chain::witness_object, chain::by_name >( key.second ).id;
@@ -190,8 +181,7 @@ DEFINE_API_IMPL( database_api_impl, list_witnesses )
             boost::make_tuple( key.first, wit_id ),
             result.witnesses,
             args.limit,
-            [&]( const witness_object& w ){ return api_witness_object( w ); },
-            reverse );
+            [&]( const witness_object& w ){ return api_witness_object( w ); });
          break;
       }
 
@@ -225,32 +215,27 @@ DEFINE_API_IMPL( database_api_impl, list_witness_votes )
 
    list_witness_votes_return result;
    result.votes.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_account_witness ):
-      case( by_account_witness_reverse ):
       {
          auto key = args.start.as< std::pair< account_name_type, account_name_type > >();
          iterate_results< chain::witness_vote_index, chain::by_account_witness >(
             boost::make_tuple( key.first, key.second ),
             result.votes,
             args.limit,
-            [&]( const witness_vote_object& v ){ return api_witness_vote_object( v ); },
-            reverse );
+            [&]( const witness_vote_object& v ){ return api_witness_vote_object( v ); });
          break;
       }
       case( by_witness_account ):
-      case( by_witness_account_reverse ):
       {
          auto key = args.start.as< std::pair< account_name_type, account_name_type > >();
          iterate_results< chain::witness_vote_index, chain::by_witness_account >(
             boost::make_tuple( key.first, key.second ),
             result.votes,
             args.limit,
-            [&]( const witness_vote_object& v ){ return api_witness_vote_object( v ); },
-            reverse );
+            [&]( const witness_vote_object& v ){ return api_witness_vote_object( v ); });
          break;
       }
       default:
@@ -286,18 +271,16 @@ DEFINE_API_IMPL( database_api_impl, list_accounts )
 
    list_accounts_return result;
    result.accounts.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_name ):
-      case( by_name_reverse ):
       {
          iterate_results< chain::account_index, chain::by_name >(
             args.start.as< protocol::account_name_type >(),
             result.accounts,
             args.limit,
-            [&]( const account_object& a ){ return api_account_object( a, _db ); }, reverse );
+            [&]( const account_object& a ){ return api_account_object( a, _db ); });
          break;
       }
       case( by_id ):
@@ -309,26 +292,24 @@ DEFINE_API_IMPL( database_api_impl, list_accounts )
             [&]( const account_object& a ){ return api_account_object( a, _db ); } );
          break;
       }
-      case( by_proxy ):
-      case( by_proxy_reverse ):
+       case( by_proxy ):
       {
          auto key = args.start.as< std::pair< account_name_type, account_name_type > >();
          iterate_results< chain::account_index, chain::by_proxy >(
             boost::make_tuple( key.first, key.second ),
             result.accounts,
             args.limit,
-            [&]( const account_object& a ){ return api_account_object( a, _db ); }, reverse );
+            [&]( const account_object& a ){ return api_account_object( a, _db ); });
          break;
       }
       case( by_next_vesting_withdrawal ):
-      case( by_next_vesting_withdrawal_reverse ):
       {
          auto key = args.start.as< std::pair< fc::time_point_sec, account_name_type > >();
          iterate_results< chain::account_index, chain::by_next_vesting_withdrawal >(
             boost::make_tuple( key.first, key.second ),
             result.accounts,
             args.limit,
-            [&]( const account_object& a ){ return api_account_object( a, _db ); }, reverse );
+            [&]( const account_object& a ){ return api_account_object( a, _db ); });
          break;
       }
       case( by_balance ):
@@ -337,7 +318,7 @@ DEFINE_API_IMPL( database_api_impl, list_accounts )
                args.start.as< protocol::share_type >(),
                result.accounts,
                args.limit,
-               [&]( const account_object& a ){ return api_account_object( a, _db ); }, true );
+               [&]( const account_object& a ){ return api_account_object( a, _db ); });
          break;
       }
       default:
@@ -377,7 +358,7 @@ DEFINE_API_IMPL( database_api_impl, list_owner_histories )
       boost::make_tuple( key.first, key.second ),
       result.owner_auths,
       args.limit,
-      [&]( const owner_authority_history_object& o ){ return api_owner_authority_history_object( o ); }, false );
+      [&]( const owner_authority_history_object& o ){ return api_owner_authority_history_object( o ); });
 
    return result;
 }
@@ -407,29 +388,26 @@ DEFINE_API_IMPL( database_api_impl, list_account_recovery_requests )
 
    list_account_recovery_requests_return result;
    result.requests.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_account ):
-      case( by_account_reverse ):
       {
          iterate_results< chain::account_recovery_request_index, chain::by_account >(
             args.start.as< account_name_type >(),
             result.requests,
             args.limit,
-            [&]( const account_recovery_request_object& a ){ return api_account_recovery_request_object( a ); }, reverse );
+            [&]( const account_recovery_request_object& a ){ return api_account_recovery_request_object( a ); });
          break;
       }
       case( by_expiration ):
-      case( by_expiration_reverse ):
       {
          auto key = args.start.as< std::pair< fc::time_point_sec, account_name_type > >();
          iterate_results< chain::account_recovery_request_index, chain::by_expiration >(
             boost::make_tuple( key.first, key.second ),
             result.requests,
             args.limit,
-            [&]( const account_recovery_request_object& a ){ return api_account_recovery_request_object( a ); }, reverse );
+            [&]( const account_recovery_request_object& a ){ return api_account_recovery_request_object( a ); });
          break;
       }
       default:
@@ -464,29 +442,26 @@ DEFINE_API_IMPL( database_api_impl, list_change_recovery_account_requests )
 
    list_change_recovery_account_requests_return result;
    result.requests.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_account ):
-      case( by_account_reverse ):
       {
          iterate_results< chain::change_recovery_account_request_index, chain::by_account >(
             args.start.as< account_name_type >(),
             result.requests,
             args.limit,
-            &database_api_impl::on_push_default< change_recovery_account_request_object >, reverse );
+            &database_api_impl::on_push_default< change_recovery_account_request_object >);
          break;
       }
       case( by_effective_date ):
-      case( by_effective_date_reverse ):
       {
          auto key = args.start.as< std::pair< fc::time_point_sec, account_name_type > >();
          iterate_results< chain::change_recovery_account_request_index, chain::by_effective_date >(
             boost::make_tuple( key.first, key.second ),
             result.requests,
             args.limit,
-            &database_api_impl::on_push_default< change_recovery_account_request_object >, reverse );
+            &database_api_impl::on_push_default< change_recovery_account_request_object >);
          break;
       }
       default:
@@ -521,23 +496,20 @@ DEFINE_API_IMPL( database_api_impl, list_escrows )
 
    list_escrows_return result;
    result.escrows.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_from_id ):
-      case( by_from_id_reverse ):
       {
          auto key = args.start.as< std::pair< account_name_type, uint32_t > >();
          iterate_results< chain::escrow_index, chain::by_from_id >(
             boost::make_tuple( key.first, key.second ),
             result.escrows,
             args.limit,
-            &database_api_impl::on_push_default< escrow_object >, reverse );
+            &database_api_impl::on_push_default< escrow_object >);
          break;
       }
       case( by_ratification_deadline ):
-      case( by_ratification_deadline_reverse ):
       {
          auto key = args.start.as< std::vector< fc::variant > >();
          FC_ASSERT( key.size() == 3, "by_ratification_deadline start requires 3 values. (bool, time_point_sec, escrow_id_type)" );
@@ -545,7 +517,7 @@ DEFINE_API_IMPL( database_api_impl, list_escrows )
             boost::make_tuple( key[0].as< bool >(), key[1].as< fc::time_point_sec >(), key[2].as< escrow_id_type >() ),
             result.escrows,
             args.limit,
-            &database_api_impl::on_push_default< escrow_object >, reverse );
+            &database_api_impl::on_push_default< escrow_object >);
          break;
       }
       default:
@@ -583,28 +555,25 @@ DEFINE_API_IMPL( database_api_impl, list_applications )
 
    list_applications_return result;
    result.applications.reserve( args.limit );
-   bool reverse = (args.order >= by_name_reverse );
 
    switch( args.order )
    {
       case( by_name ):
-      case( by_name_reverse ):
       {
          iterate_results< chain::application_index, chain::by_name >(
                  args.start.as<string>(),
                  result.applications,
                  args.limit,
-                 [&]( const application_object& a ){ return api_application_object( a ); }, reverse );
+                 [&]( const application_object& a ){ return api_application_object( a ); });
          break;
       }
       case( by_author ):
-      case( by_author_reverse ):
       {
          iterate_results< chain::application_index, chain::by_author >(
                  args.start.as< protocol::account_name_type >(),
                  result.applications,
                  args.limit,
-                 [&]( const application_object& a ){ return api_application_object( a ); }, reverse );
+                 [&]( const application_object& a ){ return api_application_object( a ); });
          break;
       }
       default:
@@ -626,13 +595,13 @@ DEFINE_API_IMPL( database_api_impl, get_application_buyings )
                args.start.as<account_name_type>(),
                result.application_buyings,
                args.limit,
-               [&]( const application_buying_object& a ){ return api_application_buying_object( a ); }, true );
+               [&]( const application_buying_object& a ){ return api_application_buying_object( a ); });
    } else if(args.search_type == "by_app_id") {
        iterate_results< chain::application_buying_index, chain::by_app_id >(
                args.start.as<application_id_type>(),
                result.application_buyings,
                args.limit,
-               [&]( const application_buying_object& a ){ return api_application_buying_object( a ); }, true );
+               [&]( const application_buying_object& a ){ return api_application_buying_object( a ); });
    } else {
       FC_ASSERT( false, "Unknown search type argument" );
    }
