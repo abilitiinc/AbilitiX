@@ -20,13 +20,20 @@ case "$1" in
         DATA_DIR=/var/lib/sophiatx_light
         LOG_DIR=/var/log/sophiatx_light
         LOG_FILE=$LOG_DIR/sophiatx-light.log
+        ENV_DEFAULT_FILE=/etc/default/sophiatx-ligh
 
+        CONFIG_DIR=/etc/sophiatx_light
+        SYSLOG_CONFIG_FILE=/etc/rsyslog.d/22-sophiatx-light.conf
+        LOGROTATE_CONFIG_FILE=/etc/logrotate.d/sophiatx-light
+
+        # Check if systemctl is present
         command -v systemctl >/dev/null 2>&1
         if [ "$?" -ne 0 ]; then
             echo "System must support systemctl to run sophiatx-light." >&2
             exit 1
         fi
 
+        # Create user sophiatx-light if does not exist
         id sophiatx-light >/dev/null 2>&1
         if [ "$?" -ne 0 ]; then
             useradd --system -U -M sophiatx-light -s /bin/false -d $DATA_DIR
@@ -36,6 +43,11 @@ case "$1" in
         test -d $LOG_DIR || mkdir -p $LOG_DIR
         touch $LOG_FILE
 
+        # Adjust files permissions and owners
+        test -d $CONFIG_DIR && chmod 644 $CONFIG_DIR/*
+        test -f $SYSLOG_CONFIG_FILE && chmod 644 $SYSLOG_CONFIG_FILE
+        test -f $LOGROTATE_CONFIG_FILE && chmod 644 $LOGROTATE_CONFIG_FILE
+
         chown -R -L sophiatx-light:sophiatx-light $DATA_DIR
         chown -R -L syslog:adm $LOG_DIR
         chmod 755 $DATA_DIR
@@ -43,9 +55,7 @@ case "$1" in
         chmod 644 $LOG_FILE
 
         # Add defaults file, if it doesn't exist
-        if [ ! -e /etc/default/sophiatx-light ]; then
-            touch /etc/default/sophiatx-light
-        fi
+        test -f $ENV_DEFAULT_FILE || touch $ENV_DEFAULT_FILE
 
         systemctl enable sophiatx-light
      ;;
