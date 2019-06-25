@@ -8,6 +8,7 @@ CMakeFiles
 cmake-build-release/
 
 programs/sophiatxd/sophiatx*
+programs/sophiatxd/etc/sophiatx/
 programs/sophiatxd/package/cmake-build-release/
 programs/sophiatxd/package/debian/.debhelper/
 programs/sophiatxd/package/debian/sophiatx/
@@ -16,6 +17,7 @@ programs/sophiatxd/package/debian/sophiatx.substvars
 programs/sophiatxd/package/debian/files
 
 programs/sophiatxd_light/sophiatxd-light*
+programs/sophiatxd_light/etc/sophiatxd_light/
 programs/sophiatxd_light/package/cmake-build-release/
 programs/sophiatxd_light/package/debian/.debhelper/
 programs/sophiatxd_light/package/debian/sophiatxd-light/
